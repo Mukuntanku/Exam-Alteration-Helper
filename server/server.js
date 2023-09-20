@@ -9,11 +9,9 @@ import path from 'path'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 
-import bodyParser from 'body-parser'
 import csv from 'fast-csv'
 import fs from 'fs'
 import dotenv from 'dotenv';
-import { error } from 'console'
 dotenv.config();
 
 const app = express();
@@ -73,14 +71,6 @@ const storagepdf = multer.diskStorage({
 
 const uploadpdf = multer({
     storage: storagepdf
-})
-
-con.connect(function(err) {
-    if(err) {
-        console.log("Error in Connection");
-    } else {
-        console.log("Connected");
-    }
 })
 
 app.get('/getEmployee', (req, res) => {
@@ -622,6 +612,18 @@ app.get('/getRatings', (req, res) => {
         if(err) return res.json({Error: "Get employee error in sql"});
         return res.json({Status: "Success", Result: result})
     })
+})
+
+app.get('/', (req, res) => {
+    return res.send("Exam Alteration Helper Server Up & Running!!")
+})
+
+con.connect(function(err) {
+    if(err) {
+        console.log("Error in Connection");
+    } else {
+        console.log("DataBase Connected Successfully!!");
+    }
 })
 
 app.listen(process.env.SERVER_PORT, ()=> {

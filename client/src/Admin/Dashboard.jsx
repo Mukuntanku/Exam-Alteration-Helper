@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 import NavItem from '../NavItem';
