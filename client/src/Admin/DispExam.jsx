@@ -7,9 +7,9 @@ import { Products } from './DispExamProd';
     const [data, setData] = useState([])
 
   useEffect(()=> {
-    axios.get('http://localhost:8081/fdashboard')
+    axios.get('/api/fdashboard')
 		.then(res => {
-            axios.get('http://localhost:8081/getAllExams/')
+            axios.get('/api/getAllExams/')
             .then(res => {
               if(res.data.Status === "Success") {
                 setData(res.data.Result);

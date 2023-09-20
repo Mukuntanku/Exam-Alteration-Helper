@@ -29,7 +29,7 @@ const Exam = () => {
     formData.append('csvFile', csvFile);
     formData.append('pdfFile', pdfFile);
 
-    axios.post('http://localhost:8081/examdetails', formData, {
+    axios.post('/api/examdetails', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(() => {

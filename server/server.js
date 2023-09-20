@@ -17,7 +17,7 @@ dotenv.config();
 const app = express();
 app.use(cors(
     {
-        origin: ["http://localhost:3000"],
+        origin: "*",
         methods: ["POST", "GET", "PUT"],
         credentials: true
     }
@@ -73,7 +73,7 @@ const uploadpdf = multer({
     storage: storagepdf
 })
 
-app.get('/getEmployee', (req, res) => {
+app.get('/api/getEmployee', (req, res) => {
     const sql = "SELECT * FROM employee";
     con.query(sql, (err, result) => {
         if(err) return res.json({Error: "Get employee error in sql"});
@@ -81,7 +81,7 @@ app.get('/getEmployee', (req, res) => {
     })
 })
 
-app.get('/get/:id', (req, res) => {
+app.get('/api/get/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM employee where id = ?";
     con.query(sql, [id], (err, result) => {
@@ -90,7 +90,7 @@ app.get('/get/:id', (req, res) => {
     })
 })
 
-app.put('/update/:id', upload.single('image'), (req, res) => {
+app.put('/api/update/:id', upload.single('image'), (req, res) => {
     const id = req.params.id;
     if (req.file && req.body.address) {
         const sql = "UPDATE employee SET address = ?, image = ? WHERE id = ?";
@@ -113,7 +113,7 @@ app.put('/update/:id', upload.single('image'), (req, res) => {
     }
 });
 
-app.put('/changepass/:id', (req, res) => {
+app.put('/api/changepass/:id', (req, res) => {
     const id = req.params.id;
     const currentpass = req.body.current;
     const newpass = req.body.new;
@@ -138,7 +138,7 @@ app.put('/changepass/:id', (req, res) => {
     });
 })
 
-app.delete('/delete/:id', (req, res) => {
+app.delete('/api/delete/:id', (req, res) => {
     const id = req.params.id;
     const sql = "Delete FROM employee WHERE id = ?";
     con.query(sql, [id], (err, result) => {
@@ -161,15 +161,15 @@ const verifyUser = (req, res, next) => {
     }
 }
 
-app.get('/dashboard',verifyUser, (req, res) => {
+app.get('/api/dashboard',verifyUser, (req, res) => {
     return res.json({Status: "Success", role: req.role, id: req.id})
 })
 
-app.get('/fdashboard',verifyUser, (req, res) => {
+app.get('/api/fdashboard',verifyUser, (req, res) => {
     return res.json({Status: "Success", role: req.role, id: req.id})
 })
 
-app.get('/adminCount', (req, res) => {
+app.get('/api/adminCount', (req, res) => {
     const sql = "Select * from users where role = 'admin'";
     con.query(sql, (err, result) => {
         if(err) return res.json({Error: "Error in runnig query"});
@@ -177,7 +177,7 @@ app.get('/adminCount', (req, res) => {
     })
 })
 
-app.get('/employeeCount', (req, res) => {
+app.get('/api/employeeCount', (req, res) => {
     const sql = "Select count(id) as employee from employee";
     con.query(sql, (err, result) => {
         if(err) return res.json({Error: "Error in runnig query"});
@@ -185,7 +185,7 @@ app.get('/employeeCount', (req, res) => {
     })
 })
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const sql = "SELECT * FROM users Where email = ? AND  password = ?";
     con.query(sql, [req.body.email, req.body.password], (err, result) => {
         if(err) return res.json({Status: "Error", Error: "Error in runnig query"});
@@ -200,7 +200,7 @@ app.post('/login', (req, res) => {
     })
 })
 
-app.post('/employeelogin', (req, res) => {
+app.post('/api/employeelogin', (req, res) => {
     const sql = "SELECT * FROM employee Where email = ?";
     con.query(sql, [req.body.email], (err, result) => {
         if(err) return res.json({Status: "Error", Error: "Error in runnig query"});
@@ -222,12 +222,12 @@ app.post('/employeelogin', (req, res) => {
     })
 })
 
-app.get('/logout', (req, res) => {
+app.get('/api/logout', (req, res) => {
     res.clearCookie('token');
     return res.json({Status: "Success"});
 })
 
-app.post('/create', (req, res) => {
+app.post('/api/create', (req, res) => {
     var name = req.body.name
     var mail = req.body.email
     var department = req.body.department
@@ -271,7 +271,7 @@ app.post('/create', (req, res) => {
 })
 
 
-app.post('/examdetails', uploadpdf.fields([{ name: 'csvFile' }, { name: 'pdfFile' }]), (req, res) => {
+app.post('/api/examdetails', uploadpdf.fields([{ name: 'csvFile' }, { name: 'pdfFile' }]), (req, res) => {
     const { csvFile, pdfFile } = req.files;
     uploadCsv( "../client/public/pdf/" + csvFile[0].filename, req)
 
@@ -330,7 +330,7 @@ function uploadCsv(path,req){
     stream.pipe(fileStream)
 }
 
-app.post('/timetable', (req, res) => {
+app.post('/api/timetable', (req, res) => {
     const sql = "SELECT filename FROM examschedulepdf WHERE examname = ? AND year = ? AND department = ?"
     con.query(sql, [req.body.examName, req.body.year, req.body.department], (err, result) => {
         if(err) return res.json({Error: "SQL error!!"});
@@ -354,7 +354,7 @@ app.post('/timetable', (req, res) => {
   
 
 var email;
-app.get('/getExams/:id', (req, res) => {
+app.get('/api/getExams/:id', (req, res) => {
     const id = req.params.id;
     // Fid -> Femail
     const sql1 = "SELECT * FROM employee WHERE id = ?";
@@ -370,7 +370,7 @@ app.get('/getExams/:id', (req, res) => {
     })
 })
 
-app.get('/getAllExams', (req, res) => {
+app.get('/api/getAllExams', (req, res) => {
     //Femail -> resp exams
     const sql = "SELECT * FROM examdetails WHERE date > CURDATE()";
     con.query(sql,(err, result) => {
@@ -379,7 +379,7 @@ app.get('/getAllExams', (req, res) => {
     })
 })
 
-app.get('/examslot/:id', (req, res) => {
+app.get('/api/examslot/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM examdetails WHERE id = ?";
     con.query(sql,[id], (err, result) => {
@@ -403,7 +403,7 @@ app.get('/examslot/:id', (req, res) => {
     })
 })
 
-app.get('/getstatus/:id', (req, res) => {
+app.get('/api/getstatus/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM employee WHERE id = ?";
     var stats = "Pending";
@@ -429,7 +429,7 @@ app.get('/getstatus/:id', (req, res) => {
     })
 })
 
-app.get('/getrequeststatus/:id', (req, res) => {
+app.get('/api/getrequeststatus/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM employee WHERE id = ?";
     var stats = "Pending"
@@ -456,7 +456,7 @@ app.get('/getrequeststatus/:id', (req, res) => {
     })
 })
 
-app.post('/setrequest/:id1/:id2/:id3', (req, res) => {
+app.post('/api/setrequest/:id1/:id2/:id3', (req, res) => {
     const fid = req.params.id1;
     const tid = req.params.id2;
     const tmail = req.params.id3;
@@ -502,7 +502,7 @@ app.post('/setrequest/:id1/:id2/:id3', (req, res) => {
     })
 })
 
-app.get('/getcurrentstatus/:id1/:id2', (req, res) => {
+app.get('/api/getcurrentstatus/:id1/:id2', (req, res) => {
     const fid = req.params.id1;
     const tid = req.params.id2;
     const sql = "SELECT status FROM requests WHERE fexamid = ? AND texamid = ?";
@@ -520,7 +520,7 @@ app.get('/getcurrentstatus/:id1/:id2', (req, res) => {
     });
 });
 
-app.put('/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
+app.put('/api/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
     const fid = req.params.id;
     const tid = req.params.id2;
     const fname = req.params.name1;
@@ -591,7 +591,7 @@ app.put('/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
     });
 });
 
-app.put('/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
+app.put('/api/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
     const fid = req.params.id;
     const tid = req.params.id2;
     const approve = "Rejected";   
@@ -606,7 +606,7 @@ app.put('/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', (req, res) => {
 });
 
 
-app.get('/getRatings', (req, res) => {
+app.get('/api/getRatings', (req, res) => {
     const sql = "SELECT Employee.name, Employee.department, Employee.image, Leaderboard.rating FROM Leaderboard JOIN Employee ON Leaderboard.fid = Employee.id";
     con.query(sql,(err, result) => {
         if(err) return res.json({Error: "Get employee error in sql"});
@@ -614,7 +614,7 @@ app.get('/getRatings', (req, res) => {
     })
 })
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     return res.send("Exam Alteration Helper Server Up & Running!!")
 })
 

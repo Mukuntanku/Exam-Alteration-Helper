@@ -13,7 +13,7 @@ function DispPDF() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8081/timetable', data)
+    axios.post('/api/timetable', data)
       .then(res => {
         if (res.data.Status === "Success") {
           setError('');

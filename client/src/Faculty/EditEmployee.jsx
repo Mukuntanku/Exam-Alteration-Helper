@@ -18,10 +18,10 @@ function EditEmployee() {
 
 	useEffect(()=> {
 		var id;
-        axios.get('http://localhost:8081/fdashboard')
+        axios.get('/api/fdashboard')
             .then(res => {
                 id = res.data.id;
-				axios.get('http://localhost:8081/get/'+id)
+				axios.get('/api/get/'+id)
 				.then(res => {
 					setData({...data,
 						name: res.data.Result[0].name,
@@ -45,10 +45,10 @@ function EditEmployee() {
 			formData.append('image', image);
 		}
 		var id1;
-		axios.get('http://localhost:8081/fdashboard')
+		axios.get('/api/fdashboard')
 		.then(res => {
 			id1 = res.data.id;
-			axios.put('http://localhost:8081/update/'+id1, formData, {
+			axios.put('/api/update/'+id1, formData, {
 				headers: { 'Content-Type': 'multipart/form-data' },
 			})
 			.then(res => {

@@ -6,13 +6,13 @@ export default function Board() {
     const [data, setData] = useState([])
     useEffect(()=> {
         var id;
-        axios.get('http://localhost:8081/fdashboard')
+        axios.get('/api/fdashboard')
             .then(res => {
                 console.log(res);
                 id = res.data.id;
                 console.log(id)
                 //
-                axios.get('http://localhost:8081/getRatings')
+                axios.get('/api/getRatings')
                 .then(res => {
                   if(res.data.Status === "Success") {
                     console.log(res.data.Result);

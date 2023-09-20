@@ -10,12 +10,12 @@ const Calender = () => {
   
     useEffect(() => {
         var id;
-        axios.get('http://localhost:8081/fdashboard')
+        axios.get('/api/fdashboard')
         .then(res => {
           id = res.data.id  
                 
           axios
-            .get('http://localhost:8081/getExams/'+id)
+            .get('/api/getExams/'+id)
             .then((res) => {
             if (res.data.Status === 'Success') {
               const formattedEvents = res.data.Result.map((exam) => {

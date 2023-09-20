@@ -13,10 +13,10 @@ function ChangePass() {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		var id1;
-		axios.get('http://localhost:8081/fdashboard')
+		axios.get('/api/fdashboard')
 		.then(res => {
 			id1 = res.data.id;
-			axios.put('http://localhost:8081/changepass/'+id1, data)
+			axios.put('/api/changepass/'+id1, data)
 			.then(res => {
 				if(res.data.Status === "Success") {
                     alert('Password Changed Successfully');

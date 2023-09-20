@@ -10,11 +10,11 @@ function EmployeeDetail() {
   useEffect(() => {
     var id;
     axios
-      .get('http://localhost:8081/fdashboard')
+      .get('/api/fdashboard')
       .then((res) => {
         id = res.data.id;
         axios
-          .get('http://localhost:8081/get/' + id)
+          .get('/api/get/' + id)
           .then((res) => setEmployee(res.data.Result[0]))
           .catch((err) => console.log(err));
       })
