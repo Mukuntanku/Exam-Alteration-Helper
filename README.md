@@ -24,15 +24,11 @@ Clone down the repository. You will need `node` and `npm` installed globally on 
 To Start Backend Server (Node):
 
 `cd server`
-
 `npm install`
-
 `npm start`
 
 To Start Frontend Server (React):
 
 `cd client`
-
 `npm install`
-
 `npm start`
