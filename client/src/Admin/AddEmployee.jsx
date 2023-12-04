@@ -13,7 +13,7 @@ function AddEmployee() {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		axios.post('http://localhost:8081/create', data)
+		axios.post('/api/create', data)
 		.then(res => {
 			if(res.data.Status === "Success") {
 				alert('New Faculty Created Successfully');

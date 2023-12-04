@@ -16,7 +16,7 @@ function Item(data){
                 data.map((value, index) => (
                     <div className="flex" key={index}>
                         <div className="item">
-                            <img src={`http://localhost:3000/images/`+value.image} alt="" />
+                            <img src={`https://casestudystorage.blob.core.windows.net/images/`+value.image} alt="" />
             
                             <div className="info">
                                 <h3 className='name'>{value.name}</h3>    

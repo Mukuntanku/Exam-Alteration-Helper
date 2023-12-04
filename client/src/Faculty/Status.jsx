@@ -11,13 +11,13 @@ function Status() {
 
   useEffect(() => {
     var id;
-    axios.get('http://localhost:8081/fdashboard')
+    axios.get('/api/fdashboard')
       .then(res => {
         console.log(res);
         id = res.data.id;
         console.log(id);
         
-        axios.get('http://localhost:8081/getstatus/' + id)
+        axios.get('/api/getstatus/' + id)
           .then(res => {
             if (res.data.Status === "Success") {
               setFData(res.data.Result);

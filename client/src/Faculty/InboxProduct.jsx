@@ -9,7 +9,7 @@ export function InboxProducts(props) {
 
   const handleAccept = () => {
     alert(`Accepted request with ID: ${props.id} ${props.id1}`);
-    axios.put('http://localhost:8081/approverequest/'+props.id1+'/'+props.id+'/'+props.faculty1+'/'+props.faculty+'/'+props.mail1+'/'+props.mail)
+    axios.put('/api/approverequest/'+props.id1+'/'+props.id+'/'+props.faculty1+'/'+props.faculty+'/'+props.mail1+'/'+props.mail)
           .then(res => {
             if (res.data.Status === "Success") {
                 alert("Request Approved Successfully");
@@ -23,7 +23,7 @@ export function InboxProducts(props) {
 
   const handleReject = () => {
     alert(`Rejected request with ID: ${props.id}`);
-    axios.put('http://localhost:8081/rejectrequest/'+props.id1+'/'+props.id)
+    axios.put('/api/rejectrequest/'+props.id1+'/'+props.id)
           .then(res => {
             if (res.data.Status === "Success") {
                 alert("Rejected Successfully");

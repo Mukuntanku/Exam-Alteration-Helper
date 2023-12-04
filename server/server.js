@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 app.use(cors(
     {
-        origin: ["http://localhost:3000"],
+        origin: "*",
         methods: ["POST", "GET", "PUT"],
         credentials: true
     }
@@ -29,11 +29,11 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const mssqlconfig = {
-    user: 'mukuntan',
-    password: 'Admin!admin',
-    server: 'case-study-dbserver.database.windows.net',
+    user: process.env.MSSQL_USER,
+    password: process.env.MSSQL_PASSWORD,
+    server: process.env.MSSQL_SERVER,
     port: 1433,
-    database: 'case-study-db',
+    database: process.env.MSSQL_DATABASE,
     authentication: {
         type: 'default',
     },
@@ -92,7 +92,7 @@ const uploadpdf = multer({
 //     })
 // })
 
-app.get('/getEmployee', async (req, res) => {
+app.get('/api/getEmployee', async (req, res) => {
     try {
         const result = await pool.request().query('SELECT * FROM employee');
         res.json({ Status: 'Success', Result: result.recordset });
@@ -111,7 +111,7 @@ app.get('/getEmployee', async (req, res) => {
 //     })
 // })
 
-app.get('/get/:id', async (req, res) => {
+app.get('/api/get/:id', async (req, res) => {
     const id = req.params.id;
     try {
         const result = await pool.request().input('id', sql.Int, id).query('SELECT * FROM employee where id = @id');
@@ -159,12 +159,13 @@ app.get('/get/:id', async (req, res) => {
 //     }
 // });
 
-app.put('/update/:id', upload.single('image'), async (req, res) => {
+app.put('/api/update/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
+    let uniqueFilename = null; // Declare uniqueFilename outside the if block
 
     if (req.file) {
         const currentDate = new Date();
-        const uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
+        uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
         
         const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage);
         const containerClient = blobServiceClient.getContainerClient('images');
@@ -184,7 +185,7 @@ app.put('/update/:id', upload.single('image'), async (req, res) => {
         values.push({ name: 'address', type: sql.NVarChar, value: req.body.address });
     }
 
-    if (req.file) {
+    if (uniqueFilename) { // Check if uniqueFilename is defined
         sqlQuery += "image = @image, ";
         values.push({ name: 'image', type: sql.NVarChar, value: uniqueFilename });
     }
@@ -233,7 +234,7 @@ app.put('/update/:id', upload.single('image'), async (req, res) => {
 //     });
 // })
 
-app.put('/changepass/:id', async (req, res) => {
+app.put('/api/changepass/:id', async (req, res) => {
     const id = req.params.id;
     const currentpass = req.body.current;
     const newpass = req.body.new;
@@ -277,7 +278,7 @@ app.put('/changepass/:id', async (req, res) => {
 //     })
 // })
 
-app.delete('/delete/:id', async (req, res) => {
+app.delete('/api/delete/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
@@ -308,11 +309,11 @@ const verifyUser = (req, res, next) => {
     }
 }
 
-app.get('/dashboard',verifyUser, (req, res) => {
+app.get('/api/dashboard',verifyUser, (req, res) => {
     return res.json({Status: "Success", role: req.role, id: req.id})
 })
 
-app.get('/fdashboard',verifyUser, (req, res) => {
+app.get('/api/fdashboard',verifyUser, (req, res) => {
     return res.json({Status: "Success", role: req.role, id: req.id})
 })
 
@@ -324,7 +325,7 @@ app.get('/fdashboard',verifyUser, (req, res) => {
 //     })
 // })
 
-app.get('/adminCount', async (req, res) => {
+app.get('/api/adminCount', async (req, res) => {
     try {
         const result = await pool.request().query("SELECT * FROM users WHERE role = 'admin'");
         return res.json(result.recordset);
@@ -342,7 +343,7 @@ app.get('/adminCount', async (req, res) => {
 //     })
 // })
 
-app.get('/employeeCount', async (req, res) => {
+app.get('/api/employeeCount', async (req, res) => {
     try {
         const result = await pool.request().query("SELECT COUNT(id) AS employee FROM employee");
         return res.json(result.recordset);
@@ -368,7 +369,7 @@ app.get('/employeeCount', async (req, res) => {
 //     })
 // })
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     try {
         const result = await pool
             .request()
@@ -412,7 +413,7 @@ app.post('/login', async (req, res) => {
 //     })
 // })
 
-app.post('/employeelogin', async (req, res) => {
+app.post('/api/employeelogin', async (req, res) => {
     try {
         const result = await pool
             .request()
@@ -440,7 +441,7 @@ app.post('/employeelogin', async (req, res) => {
     }
 });
 
-app.get('/logout', (req, res) => {
+app.get('/api/logout', (req, res) => {
     res.clearCookie('token');
     return res.json({Status: "Success"});
 })
@@ -488,11 +489,12 @@ app.get('/logout', (req, res) => {
 //     })
 // })
 
-app.post('/create', async (req, res) => {
+app.post('/api/create', async (req, res) => {
     try {
         const name = req.body.name;
         const mail = req.body.email;
         const department = req.body.department;
+        const address = req.body.address || '';
 
         const passwordLength = 10;
         const randomBytes = crypto.randomBytes(passwordLength);
@@ -500,12 +502,13 @@ app.post('/create', async (req, res) => {
 
         const hash = await bcrypt.hash(password.toString(), 10);
 
-        const sqlQuery = "INSERT INTO employee (name, email, password, department) VALUES (@name, @mail, @hash, @department)";
+        const sqlQuery = "INSERT INTO employee (name, email, password, department, address) VALUES (@name, @mail, @hash, @department, @address)";
         const request = pool.request()
             .input('name', sql.NVarChar, name)
             .input('mail', sql.NVarChar, mail)
             .input('hash', sql.NVarChar, hash)
-            .input('department', sql.NVarChar, department);
+            .input('department', sql.NVarChar, department)
+            .input('address', sql.NVarChar, address);
 
         const result = await request.query(sqlQuery);
 
@@ -553,11 +556,10 @@ app.post('/create', async (req, res) => {
 //     })
 // })
 
-app.post('/examdetails', uploadpdf.fields([{ name: 'csvFile' }, { name: 'pdfFile' }]), async (req, res) => {
+app.post('/api/examdetails', uploadpdf.fields([{ name: 'csvFile' }, { name: 'pdfFile' }]), async (req, res) => {
     try {
         const { csvFile, pdfFile } = req.files;
-        const pdfPath = "../client/public/pdf/" + pdfFile[0].filename;
-        uploadCsv(pdfPath, req);
+        uploadCsv("../client/public/pdf/" + csvFile[0].filename, req);
 
         const values = [
             req.body.examName,
@@ -697,7 +699,7 @@ async function uploadCsv(path, req) {
 //     })
 // })
 
-app.post('/timetable', async (req, res) => {
+app.post('/api/timetable', async (req, res) => {
     try {
         const sqlQuery = "SELECT filename FROM examschedulepdf WHERE examname = @examName AND year = @year AND department = @department";
         const request = pool.request()
@@ -747,7 +749,7 @@ app.post('/timetable', async (req, res) => {
 //     })
 // })
 
-app.get('/getExams/:id', async (req, res) => {
+app.get('/api/getExams/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -786,7 +788,7 @@ app.get('/getExams/:id', async (req, res) => {
 //     })
 // })
 
-app.get('/getAllExams', async (req, res) => {
+app.get('/api/getAllExams', async (req, res) => {
     try {
         // Fetch exams with a date greater than the current date
         const sql = "SELECT * FROM examdetails WHERE date > CURRENT_TIMESTAMP";
@@ -824,7 +826,7 @@ app.get('/getAllExams', async (req, res) => {
 //     })
 // })
 
-app.get('/examslot/:id', async (req, res) => {
+app.get('/api/examslot/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -889,7 +891,7 @@ app.get('/examslot/:id', async (req, res) => {
 //     })
 // })
 
-app.get('/getstatus/:id', async (req, res) => {
+app.get('/api/getstatus/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -955,7 +957,7 @@ app.get('/getstatus/:id', async (req, res) => {
 //     })
 // })
 
-app.get('/getrequeststatus/:id', async (req, res) => {
+app.get('/api/getrequeststatus/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -1041,7 +1043,7 @@ app.get('/getrequeststatus/:id', async (req, res) => {
 //     })
 // })
 
-app.post('/setrequest/:id1/:id2/:id3', async (req, res) => {
+app.post('/api/setrequest/:id1/:id2/:id3', async (req, res) => {
     try {
         const fid = req.params.id1;
         const tid = req.params.id2;
@@ -1112,7 +1114,7 @@ app.post('/setrequest/:id1/:id2/:id3', async (req, res) => {
 //     });
 // });
 
-app.get('/getcurrentstatus/:id1/:id2', async (req, res) => {
+app.get('/api/getcurrentstatus/:id1/:id2', async (req, res) => {
     try {
         const fid = req.params.id1;
         const tid = req.params.id2;
@@ -1206,7 +1208,7 @@ app.get('/getcurrentstatus/:id1/:id2', async (req, res) => {
 //     });
 // });
 
-app.put('/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res) => {
+app.put('/api/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res) => {
     const fid = req.params.id;
     const tid = req.params.id2;
     const fname = req.params.name1;
@@ -1281,7 +1283,7 @@ app.put('/approverequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res)
 //     });
 // });
 
-app.put('/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res) => {
+app.put('/api/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res) => {
     try {
         const fid = req.params.id;
         const tid = req.params.id2;
@@ -1311,7 +1313,7 @@ app.put('/rejectrequest/:id/:id2/:name1/:name2/:mail1/:mail2', async (req, res) 
 //     })
 // })
 
-app.get('/getRatings', async (req, res) => {
+app.get('/api/getRatings', async (req, res) => {
     try {
         // Fetch data from 'Leaderboard' and 'Employee' tables
         const sql = "SELECT Employee.name, Employee.department, Employee.image, Leaderboard.rating FROM Leaderboard JOIN Employee ON Leaderboard.fid = Employee.id";
@@ -1324,7 +1326,7 @@ app.get('/getRatings', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     return res.send("Exam Alteration Helper Server Up & Running!!")
 })
 

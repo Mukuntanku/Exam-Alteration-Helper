@@ -7,7 +7,7 @@ export function Products(props) {
 	const navigate = useNavigate()
 
     const handleLogout = () => {
-		axios.post('http://localhost:8081/setrequest/'+id+'/'+props.id+'/'+props.mail)
+		axios.post('/api/setrequest/'+id+'/'+props.id+'/'+props.mail)
 		.then(res => {
 			navigate('/fdashboard/status')
 		}).catch(err => console.log(err));
