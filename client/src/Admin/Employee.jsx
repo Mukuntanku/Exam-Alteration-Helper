@@ -55,7 +55,7 @@ function Employee() {
                   <td>
                     {employee.image ? (
                       <img
-                        src={`http://localhost:3000/images/`+employee.image}
+                        src={`https://casestudystorage.blob.core.windows.net/images/`+employee.image}
                         alt=""
                         className='employee_image'
                         style={{ width: '50px', height: '50px', borderRadius: '50%' }}

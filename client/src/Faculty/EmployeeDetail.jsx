@@ -26,7 +26,7 @@ function EmployeeDetail() {
       <div className="d-flex justify-content-center flex-column align-items-center mt-3">
         {employee.image ? (
           <img
-            src={`http://localhost:3000/images/` + employee.image}
+            src={`https://casestudystorage.blob.core.windows.net/images/` + employee.image}
             alt=""
             className="empImg"
             style={{ width: '500px', height: '300px', objectFit: 'cover', objectPosition: 'center', borderRadius: '20px' }}
