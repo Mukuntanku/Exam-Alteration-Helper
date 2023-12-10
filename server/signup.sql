@@ -28,9 +28,9 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `employee` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
   `address` varchar(255) NOT NULL,
   `image` varchar(255) NOT NULL,
@@ -56,7 +56,7 @@ INSERT INTO `employee` (`id`, `name`, `email`, `password`, `address`, `image`, `
 --
 
 CREATE TABLE `examdetails` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `academicyear` varchar(255) NOT NULL,
   `examname` varchar(255) NOT NULL,
   `department` varchar(255) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE `examdetails` (
 --
 
 CREATE TABLE `examschedulepdf` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `examname` varchar(255) NOT NULL,
   `year` int(11) NOT NULL,
   `department` varchar(255) NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE `examschedulepdf` (
 --
 
 CREATE TABLE `leaderboard` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `fid` int(11) NOT NULL,
   `rating` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -115,7 +115,7 @@ INSERT INTO `leaderboard` (`id`, `fid`, `rating`) VALUES
 --
 
 CREATE TABLE `requests` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `fexamid` int(11) NOT NULL,
   `texamid` int(11) NOT NULL,
   `fmail` varchar(255) DEFAULT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE `requests` (
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -143,51 +143,6 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`) VALUES
 (1, 'admin', 'admin@gmail.com', 'admin', 'admin');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `employee`
---
-ALTER TABLE `employee`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- Indexes for table `examdetails`
---
-ALTER TABLE `examdetails`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `examschedulepdf`
---
-ALTER TABLE `examschedulepdf`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `leaderboard`
---
-ALTER TABLE `leaderboard`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `requests`
---
-ALTER TABLE `requests`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
 
 --
 -- AUTO_INCREMENT for table `employee`
