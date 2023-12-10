@@ -80,10 +80,11 @@ app.get('/api/get/:id', (req, res) => {
 
 app.put('/api/update/:id', upload.single('image'), async (req, res) => {
     const id = req.params.id;
+    let uniqueFilename = null; // Declare uniqueFilename outside the if block
 
     if(req.file) {
         const currentDate = new Date();
-        const uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
+        uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
         
         const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage);
         const containerClient = blobServiceClient.getContainerClient('images');
