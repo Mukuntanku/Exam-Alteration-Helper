@@ -18,7 +18,7 @@ function DispPDF() {
         if (res.data.Status === "Success") {
           setError('');
           const filename = res.data.Result[0].filename;
-          setPdfUrl(`http://localhost:3000/pdf/${filename}`);
+          setPdfUrl(`https://casestudystorage.blob.core.windows.net/pdf/${filename}`);
           setTabledata(res.data.Result1);
           // console.log(res.data.Result1[0]);
         } else {

@@ -26,7 +26,7 @@ const Exam = () => {
     formData.append('examName', examName);
     formData.append('year', year);
     formData.append('department', department);
-    formData.append('csvFile', csvFile);
+    // formData.append('csvFile', csvFile);
     formData.append('pdfFile', pdfFile);
 
     axios.post('/api/examdetails', formData, {

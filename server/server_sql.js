@@ -84,7 +84,7 @@ app.put('/api/update/:id', upload.single('image'), async (req, res) => {
 
     if(req.file) {
         const currentDate = new Date();
-        uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
+        uniqueFilename = `${currentDate.getTime()}_${id}${path.extname(req.file.originalname)}`;
         
         const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage);
         const containerClient = blobServiceClient.getContainerClient('images');
@@ -275,15 +275,28 @@ app.post('/api/create', (req, res) => {
 })
 
 
-app.post('/api/examdetails', uploadpdf.fields([{ name: 'csvFile' }, { name: 'pdfFile' }]), (req, res) => {
-    const { csvFile, pdfFile } = req.files;
-    uploadCsv( "../client/public/pdf/" + csvFile[0].filename, req)
+app.post('/api/examdetails', upload.single('pdfFile'), async (req, res) => {
+
+    let uniqueFilename = null; // Declare uniqueFilename outside the if block
+    if(req.file) {
+        const currentDate = new Date();
+        uniqueFilename = `${currentDate.getTime()}${path.extname(req.file.originalname)}`;
+        
+        const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage);
+        const containerClient = blobServiceClient.getContainerClient('pdf');
+        const blockBlobClient = containerClient.getBlockBlobClient(uniqueFilename);
+        
+        // Use the upload method with the file buffer
+        const uploadBlobResponse = await blockBlobClient.upload(req.file.buffer, req.file.buffer.length);
+        
+        console.log(`Upload block blob ${uniqueFilename} successfully`, uploadBlobResponse.requestId);
+    }
 
     const values = [
         req.body.examName,
         req.body.year,
         req.body.department,
-        pdfFile[0].filename
+        uniqueFilename
     ]
 
     const sql = "INSERT INTO examschedulepdf (`examname`, `year`, `department`, `filename`) VALUES (?)"
