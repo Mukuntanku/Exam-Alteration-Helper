@@ -13,14 +13,14 @@ function AddEmployee() {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		axios.post('/api/create', data)
+		axios.post('https://createfaculty.azurewebsites.net/api/createfacultypost', data)
 		.then(res => {
-			if(res.data.Status === "Success") {
+			if(res.data === "Success") {
 				alert('New Faculty Created Successfully');
 				navigate('/employee')
 			}
 			else {
-				setError(res.data.Error);
+				setError(res.data);
 			}
 		})
 		.catch(err => console.log(err));
